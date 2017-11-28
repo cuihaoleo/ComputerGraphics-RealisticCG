@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>960</width>
+    <height>720</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>960</width>
+    <height>720</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>960</width>
+    <height>720</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>941</width>
+      <height>631</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="leftMargin">
+      <number>10</number>
+     </property>
+     <property name="topMargin">
+      <number>10</number>
+     </property>
+     <property name="rightMargin">
+      <number>10</number>
+     </property>
+     <property name="bottomMargin">
+      <number>10</number>
+     </property>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="spacing">
+        <number>16</number>
+       </property>
+       <property name="sizeConstraint">
+        <enum>QLayout::SetDefaultConstraint</enum>
+       </property>
+       <property name="leftMargin">
+        <number>10</number>
+       </property>
+       <property name="rightMargin">
+        <number>10</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="labelRadius">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Radius</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSlider" name="sliderRadius">
+         <property name="minimum">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelPolar">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Polar</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSlider" name="sliderPolar">
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="singleStep">
+          <number>1</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelAzimuth">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Azimuth</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSlider" name="sliderAzimuth">
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QGraphicsView" name="graphicsView"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>960</width>
+     <height>30</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionLine">
+   <property name="text">
+    <string>&amp;Line</string>
+   </property>
+  </action>
+  <action name="actionCircle">
+   <property name="text">
+    <string>&amp;Circle</string>
+   </property>
+  </action>
+  <action name="actionEllipse">
+   <property name="text">
+    <string>&amp;Ellipse</string>
+   </property>
+  </action>
+  <action name="actionFilling">
+   <property name="text">
+    <string>&amp;Filling</string>
+   </property>
+  </action>
+  <action name="action3rdBezier">
+   <property name="text">
+    <string>3rd Order &amp;Bezier curve</string>
+   </property>
+  </action>
+  <action name="actionBspline">
+   <property name="text">
+    <string>B-&amp;spline curve</string>
+   </property>
+  </action>
+  <action name="actionKoch">
+   <property name="text">
+    <string>&amp;Koch</string>
+   </property>
+  </action>
+  <action name="actionMandelbrot">
+   <property name="text">
+    <string>&amp;Mandelbrot</string>
+   </property>
+  </action>
+  <action name="actionJulia">
+   <property name="text">
+    <string>&amp;Julia set</string>
+   </property>
+  </action>
+  <action name="actionFerns">
+   <property name="text">
+    <string>&amp;Ferns</string>
+   </property>
+  </action>
+  <action name="actionWorld">
+   <property name="text">
+    <string>&amp;World</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
