@@ -8,6 +8,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsPixmapItem>
+#include <QSizeF>
 
 class RealisticScene : public QGraphicsScene
 {
@@ -30,6 +31,7 @@ private:
     QGraphicsPixmapItem *pixmapItem;
     QSize imageSize;
     QPointF center;
+    QSizeF viewportSize;
     double sphereRadius;
 
 public:

@@ -1,6 +1,8 @@
 #ifndef RSCENE_H
 #define RSCENE_H
 
+#include "rdepthbuffer.h"
+
 #include <QVector>
 #include <QVector3D>
 #include <QSize>
@@ -12,6 +14,7 @@ class RScene
 private:
     QVector<QVector3D> points;
     QVector<std::array<int, 3>> mesh;
+    QVector<RDepthBuffer> lightBuffer;
 public:
     RScene();
     bool addPoint(const QVector3D &point);

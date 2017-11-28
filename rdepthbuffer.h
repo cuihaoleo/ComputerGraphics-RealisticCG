@@ -3,6 +3,9 @@
 
 #include <QPointF>
 #include <QSize>
+#include <QVector>
+#include <QImage>
+#include <QSizeF>
 
 #include <cassert>
 
@@ -14,24 +17,24 @@ private:
 
     double scaleX, scaleY;
 
-    double *depthBuffer;
-    int *flagBuffer;
+    QVector<double> depthBuffer;
+    QVector<int> flagBuffer;
 
     int VALID_IDX(int i, int j) {
         return i >= 0 && i < bufferSize.height() && j >= 0 && j < bufferSize.width();
     }
 
     int IDX(int i, int j) {
-        assert (i >= 0 && i < bufferSize.height());
-        assert (j >= 0 && j < bufferSize.width());
         return i * bufferSize.height() + j;
     }
 
 public:
     RDepthBuffer(const QSize &size, QPointF &topLeft, QPointF &downRight);
-    QPoint convertWorldToPixel(const QPointF &worldPoint);
-    QPointF convertPixelToWorld(const QPoint &pixelPosition);
+    QPoint convertViewToPixel(const QPointF &worldPoint);
+    QPointF convertPixelToView(const QPoint &pixelPosition);
     bool update(const QPoint &pos, double depth, int flag);
+
+    void toDepthImage(QImage &im, const QSizeF &viewportSize);
 
     int W() { return bufferSize.width(); }
     int H() { return bufferSize.height(); }

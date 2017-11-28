@@ -16,18 +16,19 @@ RealisticScene::RealisticScene(const RScene &sence, const QSize &imageSize, QObj
 
     this->startViewPoint = this->lastViewPoint = QVector3D(0, 0, -10);
     this->startViewUp = this->lastViewUp = QVector3D(0, 1, 0);
-    //view = RView(lastViewPoint, 0);
+
+    viewportSize = QSizeF(5, 5);
     view = RView(lastViewPoint, lastViewUp);
-    view.lookAt(world, imageSize);
-    view.toDepthImage(image);
+    RDepthBuffer buffer = view.lookAt(world, imageSize);
+    buffer.toDepthImage(image, viewportSize);
     pixmapItem->setPixmap(QPixmap::fromImage(image));
 }
 
 void RealisticScene::setView(QVector3D viewPoint, double angle)
 {
     view = RView(viewPoint, angle);
-    view.lookAt(world, imageSize);
-    view.toDepthImage(image);
+    RDepthBuffer buffer = view.lookAt(world, imageSize);
+    buffer.toDepthImage(image, viewportSize);
     pixmapItem->setPixmap(QPixmap::fromImage(image));
 }
 
@@ -113,8 +114,8 @@ void RealisticScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     lastViewUp = rotate.map(startViewUp);
 
     view = RView(lastViewPoint, lastViewUp);
-    view.lookAt(world, imageSize);
-    view.toDepthImage(image);
+    RDepthBuffer buffer = view.lookAt(world, imageSize);
+    buffer.toDepthImage(image, viewportSize);
     pixmapItem->setPixmap(QPixmap::fromImage(image));
 }
 

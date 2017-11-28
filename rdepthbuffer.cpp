@@ -12,20 +12,18 @@ RDepthBuffer::RDepthBuffer(const QSize &size, QPointF &topLeft, QPointF &downRig
     this->scaleX = size.width() / diff.x();
     this->scaleY = size.height() / diff.y();
 
-    this->depthBuffer = new double[area];
-    std::fill_n(this->depthBuffer, area, INFINITY);
-    this->flagBuffer = new int[area];
-    std::fill_n(this->flagBuffer, area, 0);
+    this->depthBuffer = QVector<double>(area, INFINITY);
+    this->flagBuffer = QVector<int>(area, 0);
 }
 
-QPoint RDepthBuffer::convertWorldToPixel(const QPointF &worldPoint) {
+QPoint RDepthBuffer::convertViewToPixel(const QPointF &worldPoint) {
     QPointF shift = worldPoint - this->topLeft;
     double x = shift.x() * this->scaleX;
     double y = shift.y() * this->scaleY;
     return QPoint(std::round(x), std::round(y));
 }
 
-QPointF RDepthBuffer::convertPixelToWorld(const QPoint &pixelPosition) {
+QPointF RDepthBuffer::convertPixelToView(const QPoint &pixelPosition) {
     double x = pixelPosition.x() / this->scaleX;
     double y = pixelPosition.y() / this->scaleY;
     return QPointF(x, y) + this->topLeft;
@@ -42,4 +40,40 @@ bool RDepthBuffer::update(const QPoint &pos, double depth, int flag) {
     }
 
     return false;
+}
+
+void RDepthBuffer::toDepthImage(QImage &im, const QSizeF &viewportSize)
+{
+    double scaleH = viewportSize.height() / im.height();
+    double scaleW = viewportSize.width() / im.width();
+    double pixelOffsetX = im.width() / 2.0;
+    double pixelOffsetY = im.height() / 2.0;
+
+    double maxZ = 1.0;
+    for (int i=0; i<H(); i++)
+        for (int j=0; j<W(); j++) {
+            double z = getDepth(QPoint(j, i));
+            if (std::isnormal(z) && z > maxZ)
+                maxZ = z;
+        }
+
+    maxZ *= 1.1;
+    for (int i=0; i<im.height(); i++) {
+        uchar *scanline = im.scanLine(i);
+        for (int j=0; j<im.width(); j++) {
+            QPointF worldPoint((j - pixelOffsetY) * scaleW, (i - pixelOffsetX) * scaleH);
+            QPoint pos = convertViewToPixel(worldPoint);
+
+            double zval = INFINITY;
+
+            if (VALID_IDX(pos.y(), pos.x()))
+                zval = depthBuffer[IDX(pos.y(), pos.x())];
+
+            if (std::isnormal(zval)) {
+                scanline[j] = 255 * (1 - zval / maxZ);
+            } else {
+                scanline[j] = 0;
+            }
+        }
+    }
 }

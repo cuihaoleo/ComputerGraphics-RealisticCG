@@ -80,7 +80,7 @@ RView::RView(const QVector3D &viewPoint, const QVector3D &viewUp)
     constructor(viewPoint, angle);
 }
 
-void RView::lookAt(RScene scene, const QSize &bufferSize)
+RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize)
 {
     QVector<QVector3D> viewPoints;
     double maxX, maxY;
@@ -100,12 +100,12 @@ void RView::lookAt(RScene scene, const QSize &bufferSize)
 
     QPointF topLeft(minX - 1, minY - 1);
     QPointF downRight(maxX + 1, maxY + 1);
-    this->buffer = new RDepthBuffer(bufferSize, topLeft, downRight);
+    RDepthBuffer buffer(bufferSize, topLeft, downRight);
 
     QVector<QPoint> drawPoints;
     QVector<double> drawZ;
     for (const QVector3D &p: viewPoints) {
-        QPoint dp = this->buffer->convertWorldToPixel(p.toPointF());
+        QPoint dp = buffer.convertViewToPixel(p.toPointF());
         drawPoints.append(dp);
         drawZ.append(p.z());
     }
@@ -190,7 +190,7 @@ void RView::lookAt(RScene scene, const QSize &bufferSize)
             double z = (-A*xstart - B*y - D) / C; // z at (xstart, y)
             for (int x=xstart; x<=xend; x++) {
                 z -= A / C;
-                this->buffer->update(QPoint(x, y), z, iter->index);
+                buffer.update(QPoint(x, y), z, iter->index);
             }
 
             iter->xstart += iter->kac;
@@ -199,36 +199,6 @@ void RView::lookAt(RScene scene, const QSize &bufferSize)
             iter++;
         }
     }
-}
 
-void RView::toDepthImage(QImage &im)
-{
-    int height = im.height(), width = im.width();
-    double scaleH = buffer->H() / double(height);
-    double scaleW = buffer->W() / double(width);
-
-    double maxZ = 1.0;
-    for (int i=0; i<buffer->H(); i++)
-        for (int j=0; j<buffer->W(); j++) {
-            double z = buffer->getDepth(QPoint(j, i));
-            if (std::isnormal(z) && z > maxZ)
-                maxZ = z;
-        }
-
-    maxZ *= 1.1;
-    for (int i=0; i<height; i++) {
-        uchar *scanline = im.scanLine(i);
-        for (int j=0; j<width; j++) {
-            int mi = std::round(i * scaleH);
-            int mj = std::round(j * scaleW);
-            double zval = buffer->getDepth(QPoint(mj, mi));
-            assert (zval > 0);
-
-            if (std::isnormal(zval)) {
-                scanline[j] = 255 * (1 - zval / maxZ);
-            } else {
-                scanline[j] = 0;
-            }
-        }
-    }
+    return buffer;
 }

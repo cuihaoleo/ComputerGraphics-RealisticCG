@@ -17,7 +17,6 @@ protected:
     QVector3D normalVector;
     QMatrix4x4 viewTransform;
     QMatrix4x4 viewTransformR;
-    RDepthBuffer *buffer = nullptr;
 
 public:
     RView() {}
@@ -28,12 +27,7 @@ public:
 
     RView(const QVector3D &viewPoint, const QVector3D &viewUp);
 
-    ~RView() {
-        if (buffer != nullptr) delete buffer;
-    }
-
-    void lookAt(RScene scene, const QSize &bufferSize);
-    void toDepthImage(QImage &im);
+    RDepthBuffer lookAt(const RScene &scene, const QSize &bufferSize);
 };
 
 
