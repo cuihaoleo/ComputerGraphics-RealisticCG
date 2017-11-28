@@ -1,8 +1,12 @@
+#define _USE_MATH_DEFINES
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 #include "rscene.h"
 #include "realisticscene.h"
+
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -22,10 +26,13 @@ void MainWindow::showEvent(QShowEvent* event) {
     world.addTriangle(0, 1, 3);
     world.addTriangle(1, 2, 3);
 
-    RealisticScene* scene = new RealisticScene(world, QSize(512, 512));
-    ui->graphicsView->setScene(scene);
-    ui->graphicsView->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+    realisticScene = new RealisticScene(world, QSize(512, 512));
+    ui->graphicsView->setScene(realisticScene);
+    ui->graphicsView->fitInView(realisticScene->sceneRect(), Qt::KeepAspectRatio);
     ui->graphicsView->show();
+
+    ui->sliderPolar->setValue(polarStep);
+    ui->sliderAzimuth->setValue(azimuthStep);
 
     QWidget::showEvent(event);
 }
@@ -33,4 +40,32 @@ void MainWindow::showEvent(QShowEvent* event) {
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::on_sliderPolar_valueChanged(int value)
+{
+    this->polarStep = value;
+    updateScene();
+}
+
+void MainWindow::on_sliderAzimuth_valueChanged(int value)
+{
+    this->azimuthStep = value;
+    updateScene();
+}
+
+void MainWindow::updateScene()
+{
+    using namespace std;
+
+    double polar = polarStep / 100.0 * M_PI;
+    double azimuth = azimuthStep / 100.0 * M_PI * 2;
+
+    qDebug() << "Polar:" << polar << ", Azimuth:" << azimuth;
+
+    double z = -radius * sin(polar) * cos(azimuth);
+    double x = radius * sin(polar) * sin(azimuth);
+    double y = radius * cos(polar);
+
+    realisticScene->setView(QVector3D(x, y, z), 0);
 }

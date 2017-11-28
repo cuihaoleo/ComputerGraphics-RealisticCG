@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+
 #include "rscene.h"
 #include "rview.h"
 

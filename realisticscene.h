@@ -34,6 +34,9 @@ private:
 
 public:
     explicit RealisticScene(const RScene &sence, const QSize &imageSize, QObject *parent = 0);
+
+    void setView(QVector3D viewPoint, double angle);
+
     virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent);
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent);
     virtual void mousePressEvent(QGraphicsSceneMouseEvent * mouseEvent);

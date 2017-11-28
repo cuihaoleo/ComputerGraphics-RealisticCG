@@ -23,6 +23,14 @@ RealisticScene::RealisticScene(const RScene &sence, const QSize &imageSize, QObj
     pixmapItem->setPixmap(QPixmap::fromImage(image));
 }
 
+void RealisticScene::setView(QVector3D viewPoint, double angle)
+{
+    view = RView(viewPoint, angle);
+    view.lookAt(world, imageSize);
+    view.toDepthImage(image);
+    pixmapItem->setPixmap(QPixmap::fromImage(image));
+}
+
 void RealisticScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     qDebug() << Q_FUNC_INFO << mouseEvent->scenePos();
