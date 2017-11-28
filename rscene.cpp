@@ -1,3 +1,4 @@
+#include "rlightview.h"
 #include "rscene.h"
 
 #include <QPolygon>

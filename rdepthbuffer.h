@@ -17,6 +17,10 @@ private:
     double *depthBuffer;
     int *flagBuffer;
 
+    int VALID_IDX(int i, int j) {
+        return i >= 0 && i < bufferSize.height() && j >= 0 && j < bufferSize.width();
+    }
+
     int IDX(int i, int j) {
         assert (i >= 0 && i < bufferSize.height());
         assert (j >= 0 && j < bufferSize.width());
@@ -33,7 +37,17 @@ public:
     int H() { return bufferSize.height(); }
 
     double getDepth(QPoint pos) {
-        return depthBuffer[IDX(pos.y(), pos.x())];
+        if (VALID_IDX(pos.y(), pos.x()))
+            return depthBuffer[IDX(pos.y(), pos.x())];
+        else
+            return INFINITY;
+    }
+
+    int getFlag(QPoint pos) {
+        if (VALID_IDX(pos.y(), pos.x()))
+            return depthBuffer[IDX(pos.y(), pos.x())];
+        else
+            return -1;
     }
 };
 

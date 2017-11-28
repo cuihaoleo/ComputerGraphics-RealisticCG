@@ -11,19 +11,20 @@
 class RView
 {
 private:
+    void constructor(const QVector3D &viewPoint, double angle);
+
+protected:
     QVector3D normalVector;
     QMatrix4x4 viewTransform;
     QMatrix4x4 viewTransformR;
     RDepthBuffer *buffer = nullptr;
-
-    void constructor(const QVector3D &viewPoint, double angle);
 
 public:
     RView() {}
 
     RView(const QVector3D &viewPoint, double angle) {
         constructor(viewPoint, angle);
-    };
+    }
 
     RView(const QVector3D &viewPoint, const QVector3D &viewUp);
 
