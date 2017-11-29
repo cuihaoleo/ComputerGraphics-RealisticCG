@@ -63,58 +63,6 @@
         <number>10</number>
        </property>
        <item>
-        <widget class="QLabel" name="labelRadius">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Radius</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSlider" name="sliderRadius">
-         <property name="minimum">
-          <number>0</number>
-         </property>
-         <property name="maximum">
-          <number>100</number>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="labelPolar">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Polar</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSlider" name="sliderPolar">
-         <property name="maximum">
-          <number>100</number>
-         </property>
-         <property name="singleStep">
-          <number>1</number>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QLabel" name="labelAzimuth">
          <property name="font">
           <font>
@@ -129,8 +77,37 @@
        </item>
        <item>
         <widget class="QSlider" name="sliderAzimuth">
+         <property name="minimum">
+          <number>0</number>
+         </property>
          <property name="maximum">
           <number>100</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelViewY">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>ViewY</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSlider" name="sliderY">
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="singleStep">
+          <number>1</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>

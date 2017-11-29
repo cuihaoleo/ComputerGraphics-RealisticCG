@@ -10,8 +10,8 @@
 #include <QSize>
 
 #include <memory>
-
 #include <cmath>
+#include <climits>
 
 static QVector4D solvePlane(
         const QVector3D &p1, const QVector3D &p2, const QVector3D &p3 ) {
@@ -35,14 +35,19 @@ static double angleBetween(const QVector3D &a, const QVector3D &b, QVector3D *ax
 }
 
 static QMatrix4x4 rotateMatrixBetween(const QVector3D &a, const QVector3D &b) {
-    QVector3D na = a.normalized();
-    QVector3D nb = b.normalized();
-    QVector3D axis;
-    double angle = angleBetween(na, nb, &axis);
+    QVector3D cross = QVector3D::crossProduct(a, b);
+    double dot = QVector3D::dotProduct(a, b);
+    double s = a.length() * b.length() + dot;
     QMatrix4x4 ret;
-    ret.rotate(angle * 180.0 / M_PI, axis);
-    //QQuaternion qua(std::cos(angle/2), axis.normalized() * std::sin(angle/2));
-    //QMatrix4x4 ret = QMatrix4x4(qua.toRotationMatrix());
+
+    if (std::abs(s) < std::numeric_limits<float>::epsilon()) {
+        if (dot < 0)
+            ret(0, 0) = ret(1, 1) = ret(2, 2) = -1.0;
+    } else {
+        QQuaternion q(s, cross);
+        ret.rotate(q.normalized());
+    }
+
     return ret;
 }
 
@@ -73,13 +78,27 @@ RView::RView(const QVector3D &viewPoint, const QVector3D &viewUp)
 {
     QVector3D view = -viewPoint.normalized();
     static const QVector3D axisZ(0, 0, 1);
+    static const QVector3D axisY(0, 1, 0);
 
     QMatrix4x4 rotate1 = rotateMatrixBetween(view, axisZ); // rotate1: view in world -> z'
-    QVector3D viewUp1 = rotate1.map(viewUp);
-    double angle = angleBetween(viewUp1, QVector3D(0, 1, 0));
 
-    qDebug() << "ANGLE:" << angle;
-    constructor(viewPoint, angle);
+    QVector3D viewUp1 = rotate1.map(viewUp);
+    QMatrix4x4 rotate2 = rotateMatrixBetween(viewUp1, axisY);
+    rotate2(2, 2) = 1.0;  // rotate2: x, y rotate
+
+    QMatrix4x4 translate;
+    QVector3D newZ = rotate1.map(-viewPoint);
+    translate.translate(0, 0, newZ.z());  // move origin
+
+    QMatrix4x4 combine = translate * rotate2 * rotate1;
+    qDebug() << Q_FUNC_INFO << "R1 = " << rotate1;
+    qDebug() << Q_FUNC_INFO << "R2 = " << rotate2;
+    qDebug() << Q_FUNC_INFO << " T = " << translate;
+    combine.optimize();  // combile: world -> view
+
+    this->normalVector = view.normalized();
+    this->viewTransform = combine;
+    this->viewTransformR = combine.inverted();
 }
 
 RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize, bool viewOnly)

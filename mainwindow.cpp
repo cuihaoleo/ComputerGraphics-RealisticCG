@@ -26,10 +26,10 @@ void MainWindow::showEvent(QShowEvent* event) {
     world.addTriangle(0, 1, 3);
     world.addTriangle(1, 2, 3);
 
-    world.addPoint(QVector3D(4, -1.2, 4));
-    world.addPoint(QVector3D(-4, -1.2, 4));
-    world.addPoint(QVector3D(-4, -1.2, -4));
-    world.addPoint(QVector3D(4, -1.2, -4));
+    world.addPoint(QVector3D(3, -1.5, 3));
+    world.addPoint(QVector3D(-3, -1.5, 3));
+    world.addPoint(QVector3D(-3, -1.5, -3));
+    world.addPoint(QVector3D(3, -1.5, -3));
     world.addTriangle(4, 5, 6);
     world.addTriangle(6, 7, 4);
 
@@ -41,8 +41,8 @@ void MainWindow::showEvent(QShowEvent* event) {
     ui->graphicsView->fitInView(realisticScene->sceneRect(), Qt::KeepAspectRatio);
     ui->graphicsView->show();
 
-    ui->sliderPolar->setValue(polarStep);
-    ui->sliderAzimuth->setValue(azimuthStep);
+    ui->sliderAzimuth->setValue(49);
+    ui->sliderY->setValue(26);
 
     QWidget::showEvent(event);
 }
@@ -52,15 +52,15 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_sliderPolar_valueChanged(int value)
+void MainWindow::on_sliderAzimuth_valueChanged(int value)
 {
-    this->polarStep = value;
+    viewAzimuth = value / 100.0 * 2.0 * M_PI;
     updateScene();
 }
 
-void MainWindow::on_sliderAzimuth_valueChanged(int value)
+void MainWindow::on_sliderY_valueChanged(int value)
 {
-    this->azimuthStep = value;
+    viewY = 1.0 + value / 50.0;
     updateScene();
 }
 
@@ -68,14 +68,17 @@ void MainWindow::updateScene()
 {
     using namespace std;
 
-    double polar = polarStep / 100.0 * M_PI;
-    double azimuth = azimuthStep / 100.0 * M_PI * 2;
+    static const QVector3D axisY(0, 1, 0);
+    double rxz = std::sqrt(viewRadius * viewRadius - viewY * viewY);
+    assert(rxz > 0);
+    double viewZ = -rxz * cos(viewAzimuth);
+    double viewX = rxz * sin(viewAzimuth);
+    QVector3D viewPoint = QVector3D(viewX, viewY, viewZ);
 
-    qDebug() << "Polar:" << polar << ", Azimuth:" << azimuth;
+    QVector3D viewUp;
+    viewUp = QVector3D::crossProduct(viewPoint, axisY);
+    viewUp = QVector3D::crossProduct(viewPoint, viewUp);
 
-    double z = -radius * sin(polar) * cos(azimuth);
-    double x = radius * sin(polar) * sin(azimuth);
-    double y = radius * cos(polar);
-
-    realisticScene->setView(QVector3D(x, y, z), 0);
+    qDebug() << Q_FUNC_INFO << viewUp;
+    realisticScene->setView(QVector3D(viewX, viewY, viewZ), viewUp);
 }

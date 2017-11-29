@@ -18,12 +18,6 @@ private:
     RScene world;
     RView view;
 
-    QVector3D startViewPoint;
-    QVector3D lastViewPoint;
-
-    QVector3D startViewUp;
-    QVector3D lastViewUp;
-
     QPointF startPosition;
     double startZ;
     QVector3D lastView;
@@ -38,11 +32,7 @@ public:
     explicit RealisticScene(const RScene &sence, const QSize &imageSize, QObject *parent = 0);
 
     void setView(QVector3D viewPoint, double angle);
-
-    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent);
-    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent);
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent * mouseEvent);
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent);
+    void setView(QVector3D viewPoint, QVector3D viewUp);
 };
 
 #endif // REALISTICSCENE_H
