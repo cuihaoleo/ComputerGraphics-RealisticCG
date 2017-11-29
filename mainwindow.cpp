@@ -33,7 +33,7 @@ void MainWindow::showEvent(QShowEvent* event) {
     world.addTriangle(4, 5, 6);
     world.addTriangle(6, 7, 4);
 
-    world.setBaseBrightness(0.2);
+    world.setBaseLight(0.2);
     world.addLight(QVector3D(0, 10, 10), 40);
 
     realisticScene = new RealisticScene(world, QSize(512, 512));

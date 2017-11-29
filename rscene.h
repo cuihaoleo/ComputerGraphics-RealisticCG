@@ -22,27 +22,35 @@ private:
     struct LightDescribe {
         RDepthBuffer buffer;
         QMatrix4x4 transform;
-        double brightness;
+        QVector3D light;
     };
 
     QVector<QVector3D> points;
     QVector<std::array<int, 3>> mesh;
+    QVector<QVector3D> reflect;
     std::vector<LightDescribe> lights;
-    double baseBrightness = 0.0;
+    QVector3D baseLight = QVector3D(0, 0, 0);
 
 public:
     RScene();
 
-    void setBaseBrightness(double bright) {
-        assert(bright >= 0.0);
-        baseBrightness = bright;
+    void setBaseLight(const QVector3D light) {
+        baseLight = light;
+    }
+
+    void setBaseLight(double light) {
+        setBaseLight(QVector3D(light, light, light));
     }
 
     bool addPoint(const QVector3D &point);
-    void addTriangle(int ia, int ib, int ic);
-    void addLight(const QVector3D origin, double bright, QSize bsize = QSize(1024, 1024));
+    void addTriangle(int ia, int ib, int ic, const QVector3D &reflectBGR = QVector3D(1, 1, 1));
 
-    double getBrightness(QVector3D position, int meshIndex) const;
+    void addLight(const QVector3D &origin, const QVector3D &light, QSize bsize = QSize(1024, 1024));
+    void addLight(const QVector3D &origin, double light, QSize bsize = QSize(1024, 1024)) {
+        addLight(origin, QVector3D(light, light, light), bsize);
+    }
+
+    QVector3D getLight(const QVector3D &position, int meshIndex) const;
 };
 
 #endif // RSCENE_H

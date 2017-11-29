@@ -221,8 +221,8 @@ RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize, bool vi
                 else {
                     QPointF view = buffer.convertPixelToView(QPoint(x, y));
                     QVector3D world = viewTransformR.map(QVector3D(view.x(), view.y(), z));
-                    double bright = scene.getBrightness(world, iter->index);
-                    double decayed = bright / (z * z);
+                    QVector3D light = scene.getLight(world, iter->index);
+                    QVector3D decayed = light / (z * z);
                     buffer.update(QPoint(x, y), iter->index, z, decayed);
                 }
             }

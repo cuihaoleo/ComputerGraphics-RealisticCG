@@ -1,6 +1,7 @@
 #include "rdepthbuffer.h"
 
 #include <cmath>
+#include <QRgb>
 
 RDepthBuffer::RDepthBuffer(const QSize &size, QPointF &topLeft, QPointF &downRight) {
     this->topLeft = topLeft;
@@ -13,7 +14,7 @@ RDepthBuffer::RDepthBuffer(const QSize &size, QPointF &topLeft, QPointF &downRig
     this->scaleY = size.height() / diff.y();
 
     this->depthBuffer = QVector<double>(area, INFINITY);
-    this->lightBuffer = QVector<double>(area, 0);
+    this->lightBuffer = QVector<QVector3D>(area, QVector3D());
     this->flagBuffer = QVector<int>(area, 0);
 }
 
@@ -30,7 +31,7 @@ QPointF RDepthBuffer::convertPixelToView(const QPoint &pixelPosition) const {
     return QPointF(x, y) + this->topLeft;
 }
 
-bool RDepthBuffer::update(const QPoint &pos, int flag, double depth, double light) {
+bool RDepthBuffer::update(const QPoint &pos, int flag, double depth, const QVector3D &light) {
     int index = IDX(pos.y(), pos.x());
     double oldDepth = this->depthBuffer[index];
 
@@ -87,21 +88,27 @@ void RDepthBuffer::toImage(QImage &im, const QSizeF &viewportSize)
     double pixelOffsetX = im.width() / 2.0;
     double pixelOffsetY = im.height() / 2.0;
 
-    double maxBright = 0.0;
+    double maxLight = 0.0;
     for (int i=0; i<H(); i++)
         for (int j=0; j<W(); j++) {
-            double b = getBrightness(QPoint(j, i));
-            if (std::isnormal(b) && b > maxBright)
-                maxBright = b;
+            QVector3D light = getLight(QPoint(j, i));
+            for (int k=0; k<3; k++)
+                if (std::isnormal(light[k]) && light[k] > maxLight)
+                    maxLight = light[k];
         }
 
     for (int i=0; i<im.height(); i++) {
-        uchar *scanline = im.scanLine(i);
+        QRgb *scanline = (QRgb*)im.scanLine(i);
         for (int j=0; j<im.width(); j++) {
             QPointF worldPoint((j - pixelOffsetY) * scaleW, (i - pixelOffsetX) * scaleH);
             QPoint pos = convertViewToPixel(worldPoint);
-            double bval = getBrightness(pos);
-            scanline[j] = 255 * bval / maxBright;
+
+            QVector3D light = getLight(pos);
+            int bval = 255 * light[0] / maxLight;
+            int gval = 255 * light[1] / maxLight;
+            int rval = 255 * light[2] / maxLight;
+
+            scanline[j] = qRgb(rval, gval, bval);
         }
     }
 }
