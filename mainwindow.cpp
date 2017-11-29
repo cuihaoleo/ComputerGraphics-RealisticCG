@@ -1,5 +1,3 @@
-#define _USE_MATH_DEFINES
-
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -77,14 +75,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_sliderAzimuth_valueChanged(int value)
 {
-    qDebug() << Q_FUNC_INFO << value;
     viewAzimuth = value / 100.0 * M_PI + M_PI_2;
     updateScene();
 }
 
 void MainWindow::on_sliderY_valueChanged(int value)
 {
-    qDebug() << Q_FUNC_INFO << value;
     viewY = -0.5 + value / 20.0;
     updateScene();
 }

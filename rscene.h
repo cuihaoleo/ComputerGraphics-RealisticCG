@@ -3,17 +3,13 @@
 
 #include "rdepthbuffer.h"
 
-#include <QMatrix4x4>
-#include <QPair>
-#include <QVector>
-#include <QVector3D>
-#include <QSize>
-
 #include <array>
 #include <memory>
 #include <vector>
 
-#include <cassert>
+#include <QMatrix4x4>
+#include <QVector3D>
+#include <QSize>
 
 class RScene
 {
@@ -25,14 +21,14 @@ private:
         QVector3D light;
     };
 
-    QVector<QVector3D> points;
-    QVector<std::array<int, 3>> mesh;
-    QVector<QVector3D> reflect;
+    std::vector<QVector3D> points;
+    std::vector<std::array<int, 3>> mesh;
+    std::vector<QVector3D> reflect;
     std::vector<LightDescribe> lights;
     QVector3D baseLight = QVector3D(0, 0, 0);
 
 public:
-    RScene();
+    RScene() = default;
 
     void setBaseLight(const QVector3D light) {
         baseLight = light;

@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QRgb>
 
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 RDepthBuffer::RDepthBuffer(const QSize &size, QPointF &topLeft, QPointF &downRight) {
@@ -15,9 +16,9 @@ RDepthBuffer::RDepthBuffer(const QSize &size, QPointF &topLeft, QPointF &downRig
     this->scaleX = size.width() / diff.x();
     this->scaleY = size.height() / diff.y();
 
-    this->depthBuffer = QVector<double>(area, INFINITY);
-    this->lightBuffer = QVector<QVector3D>(area, QVector3D());
-    this->flagBuffer = QVector<int>(area, 0);
+    this->depthBuffer = std::vector<double>(area, INFINITY);
+    this->lightBuffer = std::vector<QVector3D>(area, QVector3D());
+    this->flagBuffer = std::vector<int>(area, 0);
 }
 
 QPoint RDepthBuffer::convertViewToPixel(const QPointF &worldPoint) const {

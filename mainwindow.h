@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#define _USE_MATH_DEFINES
+
 #include <QMainWindow>
 #include "realisticscene.h"
 

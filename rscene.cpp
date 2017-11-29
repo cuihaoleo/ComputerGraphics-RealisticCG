@@ -3,33 +3,26 @@
 
 #include <QPolygon>
 
-#include <cassert>
-
-RScene::RScene()
-{
-
-}
-
 int RScene::addPoint(const QVector3D &point) {
-    int index = points.indexOf(point);
-    if (index < 0) {
-        index = points.size();
-        points.append(point);
+    auto it = std::find(points.begin(), points.end(), point);
+
+    if (it == points.end()) {
+        points.push_back(point);
+        return int(points.size() - 1);
     }
 
-    return index;
+    return it - points.begin();
 }
 
 void RScene::addTriangle(int ia, int ib, int ic, const QVector3D &reflectBGR){
     std::array<int, 3> arr{ia, ib, ic};
-    mesh.append(arr);
-    reflect.append(reflectBGR);
+    mesh.push_back(arr);
+    reflect.push_back(reflectBGR);
 }
 
 void RScene::addPolygon(std::initializer_list<int> args, const QVector3D &reflectBGR)
 {
-    int n_args = args.size();
-    assert(n_args >= 3);
+    assert(args.size() >= 3);
 
     auto p = args.begin();
     int ia = *(p++);

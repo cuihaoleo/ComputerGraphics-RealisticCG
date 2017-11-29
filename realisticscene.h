@@ -4,10 +4,11 @@
 #include "rscene.h"
 #include "rview.h"
 
-#include <QVector3D>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsPixmapItem>
+
+#include <QVector3D>
 #include <QSizeF>
 
 class RealisticScene : public QGraphicsScene
@@ -28,8 +29,6 @@ private:
 
 public:
     explicit RealisticScene(const RScene &sence, const QSize &imageSize, QObject *parent = 0);
-
-    void setView(QVector3D viewPoint, double angle);
     void setView(QVector3D viewPoint, QVector3D viewUp);
 };
 

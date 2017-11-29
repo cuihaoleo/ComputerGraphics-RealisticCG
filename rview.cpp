@@ -1,18 +1,19 @@
-#define _USE_MATH_DEFINES
-
 #include "rscene.h"
 #include "rview.h"
+
+#define _USE_MATH_DEFINES
+#include <cmath>
+#include <climits>
+
+#include <list>
+#include <algorithm>
+#include <memory>
 
 #include <QVector2D>
 #include <QVector3D>
 #include <QMatrix4x4>
 #include <QQuaternion>
 #include <QSize>
-
-#include <algorithm>
-#include <memory>
-#include <cmath>
-#include <climits>
 
 static QVector4D solvePlane(
         const QVector3D &p1, const QVector3D &p2, const QVector3D &p3 ) {
@@ -101,7 +102,7 @@ RView::RView(const QVector3D &viewPoint, const QVector3D &viewUp)
 
 RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize, bool viewOnly)
 {
-    QVector<QVector3D> viewPoints;
+    std::vector<QVector3D> viewPoints;
     double maxX, maxY;
     double minX, minY;
 
@@ -114,7 +115,7 @@ RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize, bool vi
         if (moved.x() < minX) minX = moved.x();
         if (moved.y() > maxY) maxY = moved.y();
         if (moved.y() < minY) minY = moved.y();
-        viewPoints.append(moved);
+        viewPoints.push_back(moved);
     }
 
     QPointF topLeft(minX - 1, minY - 1);
@@ -122,19 +123,19 @@ RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize, bool vi
 
     RDepthBuffer buffer(bufferSize, topLeft, downRight);
 
-    QVector<QPoint> drawPoints;
-    QVector<double> drawZ;
+    std::vector<QPoint> drawPoints;
+    std::vector<double> drawZ;
     for (const QVector3D &p: viewPoints) {
         QPoint dp = buffer.convertViewToPixel(p.toPointF());
-        drawPoints.append(dp);
-        drawZ.append(p.z());
+        drawPoints.push_back(dp);
+        drawZ.push_back(p.z());
     }
 
     struct PTItem {
         int idx;
         int ymax;
     };
-    QVector<QVector<PTItem>> PT(bufferSize.height());
+    std::vector<std::list<PTItem>> PT(bufferSize.height());
 
     for (int i=0; i<scene.mesh.size(); i++) {
         const QPoint &pa = drawPoints[scene.mesh[i][0]];
@@ -144,7 +145,7 @@ RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize, bool vi
         int ymin = std::min({pa.y(), pb.y(), pc.y()});
         int ymax = std::max({pa.y(), pb.y(), pc.y()});
 
-        PT[ymin].append(PTItem{ i, ymax });
+        PT[ymin].push_back(PTItem{ i, ymax });
     }
 
     struct APTItem {
@@ -156,7 +157,7 @@ RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize, bool vi
         double zmin, zmax;
         int xturn;
     };
-    QVector<APTItem> APT;
+    std::list<APTItem> APT;
 
     for (int y=0; y<bufferSize.height(); y++) {
 
@@ -192,11 +193,11 @@ RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize, bool vi
             item.xturn = std::round(pb.x());
             item.zmin = std::min({z0, z1, z2});
             item.zmax = std::max({z0, z1, z2});
-            APT.append(item);
+            APT.push_back(item);
         }
 
         // scanline
-        QVector<APTItem>::iterator iter = APT.begin();
+        std::list<APTItem>::iterator iter = APT.begin();
         while (iter != APT.end()) {
             if (y > iter->ymax) {
                 iter = APT.erase(iter);

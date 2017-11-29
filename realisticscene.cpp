@@ -1,6 +1,8 @@
 #include "realisticscene.h"
 
+#define _USE_MATH_DEFINES
 #include <cmath>
+
 #include <QMatrix4x4>
 
 RealisticScene::RealisticScene(const RScene &sence, const QSize &imageSize, QObject *parent):
@@ -13,14 +15,6 @@ RealisticScene::RealisticScene(const RScene &sence, const QSize &imageSize, QObj
     this->pixmapItem = addPixmap(QPixmap::fromImage(this->image));
 
     viewportSize = QSizeF(5, 5);
-    pixmapItem->setPixmap(QPixmap::fromImage(image));
-}
-
-void RealisticScene::setView(QVector3D viewPoint, double angle)
-{
-    view = RView(viewPoint, angle);
-    RDepthBuffer buffer = view.lookAt(world, imageSize);
-    buffer.toImage(image, viewportSize);
     pixmapItem->setPixmap(QPixmap::fromImage(image));
 }
 

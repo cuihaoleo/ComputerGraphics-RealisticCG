@@ -1,16 +1,18 @@
 #ifndef RDEPTHBUFFER_H
 #define RDEPTHBUFFER_H
 
-#include <QPointF>
+#define _USE_MATH_DEFINES
+#include <cmath>
+
+#include <vector>
+#include <cassert>
+
 #include <QVector3D>
 #include <QPoint>
+#include <QPointF>
 #include <QSize>
-#include <QVector>
-#include <QImage>
 #include <QSizeF>
-
-#include <cassert>
-#include <cmath>
+#include <QImage>
 
 class RDepthBuffer
 {
@@ -20,9 +22,9 @@ private:
 
     double scaleX, scaleY;
 
-    QVector<double> depthBuffer;
-    QVector<QVector3D> lightBuffer;
-    QVector<int> flagBuffer;
+    std::vector<double> depthBuffer;
+    std::vector<QVector3D> lightBuffer;
+    std::vector<int> flagBuffer;
 
     int VALID_IDX(int i, int j) const {
         return i >= 0 && i < bufferSize.height() && j >= 0 && j < bufferSize.width();
