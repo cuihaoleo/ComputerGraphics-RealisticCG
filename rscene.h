@@ -42,11 +42,16 @@ public:
         setBaseLight(QVector3D(light, light, light));
     }
 
-    bool addPoint(const QVector3D &point);
+    int addPoint(const QVector3D &point);
 
     void addTriangle(int ia, int ib, int ic, const QVector3D &reflectBGR);
     void addTriangle(int ia, int ib, int ic, double r = 1.0) {
         addTriangle(ia, ib, ic, QVector3D(r, r, r));
+    }
+
+    void addPolygon(std::initializer_list<int> args, const QVector3D &reflectBGR);
+    void addPolygon(std::initializer_list<int> args, double r = 1.0) {
+        addPolygon(args, QVector3D(r, r, r));
     }
 
     void addLight(const QVector3D &origin, const QVector3D &light, QSize bsize = QSize(1024, 1024));

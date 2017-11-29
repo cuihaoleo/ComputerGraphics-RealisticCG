@@ -30,7 +30,7 @@ private:
 
     double viewAzimuth;
     double viewY;
-    double viewRadius = 10.0;
+    double viewRadius = 8.0;
 
     void updateScene();
 };
