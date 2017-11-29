@@ -1,7 +1,9 @@
 #include "rdepthbuffer.h"
 
-#include <cmath>
+#include <QDebug>
 #include <QRgb>
+
+#include <cmath>
 
 RDepthBuffer::RDepthBuffer(const QSize &size, QPointF &topLeft, QPointF &downRight) {
     this->topLeft = topLeft;

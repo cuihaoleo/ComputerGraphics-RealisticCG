@@ -34,7 +34,8 @@ void RScene::addLight(const QVector3D &origin, const QVector3D &light, QSize bsi
 
 QVector3D RScene::getLight(const QVector3D &position, int meshIndex) const
 {
-    QVector3D sum = baseLight;
+    QVector3D ref = reflect[meshIndex];
+    QVector3D sum = baseLight * ref;
 
     for (const LightDescribe &li: lights) {
         QVector3D mapped = li.transform.map(position);
@@ -42,9 +43,10 @@ QVector3D RScene::getLight(const QVector3D &position, int meshIndex) const
         QPoint pos = li.buffer.convertViewToPixel(point);
         double depth = li.buffer.getDepth(pos);
         int flag = li.buffer.getFlag(pos);
+        ref = li.buffer.getLight(pos);
 
         if (flag == meshIndex) {
-            QVector3D decayed = li.light / (depth * depth);
+            QVector3D decayed = li.light * ref / (1 + depth * depth);
             sum += decayed;
         }
     }

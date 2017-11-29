@@ -30,18 +30,18 @@ void MainWindow::showEvent(QShowEvent* event) {
     world.addPoint(QVector3D(-3, -1.5, 3));
     world.addPoint(QVector3D(-3, -1.5, -3));
     world.addPoint(QVector3D(3, -1.5, -3));
-    world.addTriangle(4, 5, 6);
-    world.addTriangle(6, 7, 4);
+    world.addTriangle(4, 5, 6, 0.2);
+    world.addTriangle(6, 7, 4, 0.2);
 
     world.setBaseLight(0.2);
-    world.addLight(QVector3D(0, 10, 10), 40);
+    world.addLight(QVector3D(0, 10, 10), 20);
 
     realisticScene = new RealisticScene(world, QSize(512, 512));
     ui->graphicsView->setScene(realisticScene);
     ui->graphicsView->fitInView(realisticScene->sceneRect(), Qt::KeepAspectRatio);
     ui->graphicsView->show();
 
-    ui->sliderAzimuth->setValue(49);
+    ui->sliderAzimuth->setValue(58);
     ui->sliderY->setValue(26);
 
     QWidget::showEvent(event);
@@ -54,12 +54,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_sliderAzimuth_valueChanged(int value)
 {
+    qDebug() << Q_FUNC_INFO << value;
     viewAzimuth = value / 100.0 * 2.0 * M_PI;
     updateScene();
 }
 
 void MainWindow::on_sliderY_valueChanged(int value)
 {
+    qDebug() << Q_FUNC_INFO << value;
     viewY = 1.0 + value / 50.0;
     updateScene();
 }
@@ -79,6 +81,5 @@ void MainWindow::updateScene()
     viewUp = QVector3D::crossProduct(viewPoint, axisY);
     viewUp = QVector3D::crossProduct(viewPoint, viewUp);
 
-    qDebug() << Q_FUNC_INFO << viewUp;
     realisticScene->setView(QVector3D(viewX, viewY, viewZ), viewUp);
 }

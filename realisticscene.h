@@ -24,9 +24,7 @@ private:
     QImage image;
     QGraphicsPixmapItem *pixmapItem;
     QSize imageSize;
-    QPointF center;
     QSizeF viewportSize;
-    double sphereRadius;
 
 public:
     explicit RealisticScene(const RScene &sence, const QSize &imageSize, QObject *parent = 0);

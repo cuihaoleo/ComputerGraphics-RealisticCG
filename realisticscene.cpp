@@ -9,8 +9,6 @@ RealisticScene::RealisticScene(const RScene &sence, const QSize &imageSize, QObj
     this->setBackgroundBrush(Qt::gray);
     this->world = sence;
     this->imageSize = imageSize;
-    this->center = QPointF(imageSize.width()/2.0, imageSize.height()/2.0);
-    this->sphereRadius = qMin(imageSize.width()/2.0, imageSize.height()/2.0);
     this->image = QImage(imageSize, QImage::Format_RGB32);
     this->pixmapItem = addPixmap(QPixmap::fromImage(this->image));
 

@@ -43,7 +43,11 @@ public:
     }
 
     bool addPoint(const QVector3D &point);
-    void addTriangle(int ia, int ib, int ic, const QVector3D &reflectBGR = QVector3D(1, 1, 1));
+
+    void addTriangle(int ia, int ib, int ic, const QVector3D &reflectBGR);
+    void addTriangle(int ia, int ib, int ic, double r = 1.0) {
+        addTriangle(ia, ib, ic, QVector3D(r, r, r));
+    }
 
     void addLight(const QVector3D &origin, const QVector3D &light, QSize bsize = QSize(1024, 1024));
     void addLight(const QVector3D &origin, double light, QSize bsize = QSize(1024, 1024)) {

@@ -9,6 +9,7 @@
 #include <QQuaternion>
 #include <QSize>
 
+#include <algorithm>
 #include <memory>
 #include <cmath>
 #include <climits>
@@ -91,9 +92,6 @@ RView::RView(const QVector3D &viewPoint, const QVector3D &viewUp)
     translate.translate(0, 0, newZ.z());  // move origin
 
     QMatrix4x4 combine = translate * rotate2 * rotate1;
-    qDebug() << Q_FUNC_INFO << "R1 = " << rotate1;
-    qDebug() << Q_FUNC_INFO << "R2 = " << rotate2;
-    qDebug() << Q_FUNC_INFO << " T = " << translate;
     combine.optimize();  // combile: world -> view
 
     this->normalVector = view.normalized();
@@ -155,6 +153,7 @@ RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize, bool vi
         double kab, kac, kbc;
         int ymax, yturn;
         double xstart, xend;
+        double zmin, zmax;
         int xturn;
     };
     QVector<APTItem> APT;
@@ -165,13 +164,14 @@ RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize, bool vi
         for (PTItem &store: PT[y]) {
             int idx = store.idx, ymax = store.ymax;
             const std::array<int, 3> &mesh = scene.mesh[idx];
+            double z0 = drawZ[mesh[0]], z1 = drawZ[mesh[1]], z2 = drawZ[mesh[2]];
 
             QVector3D pa(drawPoints[mesh[0]]);
-            pa.setZ(drawZ[mesh[0]]);
+            pa.setZ(z0);
             QVector3D pb(drawPoints[mesh[1]]);
-            pb.setZ(drawZ[mesh[1]]);
+            pb.setZ(z1);
             QVector3D pc(drawPoints[mesh[2]]);
-            pc.setZ(drawZ[mesh[2]]);
+            pc.setZ(z2);
 
             // sort
             if (pa.y() > pb.y()) std::swap(pa, pb);
@@ -190,6 +190,8 @@ RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize, bool vi
             item.kbc = (pb.x() - pc.x()) / (pb.y() - pc.y());
             item.xstart = item.xend = pa.x();
             item.xturn = std::round(pb.x());
+            item.zmin = std::min({z0, z1, z2});
+            item.zmax = std::max({z0, z1, z2});
             APT.append(item);
         }
 
@@ -202,28 +204,27 @@ RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize, bool vi
             }
 
             double delta_yend = y < iter->yturn ? iter->kab : iter->kbc;
+            int index = iter->index;
             int xstart = std::round(qMin(iter->xstart, iter->xend));
             int xend = std::round(qMax(iter->xstart, iter->xend));
+            double zmin = iter->zmin, zmax = iter->zmax;
             double A = iter->factor[0];
             double B = iter->factor[1];
             double C = iter->factor[2];
             double D = iter->factor[3];
 
             double z = (-A*xstart - B*y - D) / C; // z at (xstart, y)
-            for (int x=xstart; x<=xend; x++) {
-                z -= A / C;
-
-                if (z <= 0)
-                    continue;
+            for (int x=xstart; x<=xend; x++, z -= A / C) {
+                double zmod = std::max(zmin, std::min(z, zmax));
 
                 if (viewOnly)
-                    buffer.update(QPoint(x, y), iter->index, z);
+                    buffer.update(QPoint(x, y), index, zmod, scene.reflect[index]);
                 else {
                     QPointF view = buffer.convertPixelToView(QPoint(x, y));
-                    QVector3D world = viewTransformR.map(QVector3D(view.x(), view.y(), z));
-                    QVector3D light = scene.getLight(world, iter->index);
-                    QVector3D decayed = light / (z * z);
-                    buffer.update(QPoint(x, y), iter->index, z, decayed);
+                    QVector3D world = viewTransformR.map(QVector3D(view.x(), view.y(), zmod));
+                    QVector3D light = scene.getLight(world, index);
+                    QVector3D decayed = light / (1 + zmod * zmod);
+                    buffer.update(QPoint(x, y), index, zmod, decayed);
                 }
             }
 
