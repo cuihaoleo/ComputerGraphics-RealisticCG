@@ -13,29 +13,31 @@ RDepthBuffer::RDepthBuffer(const QSize &size, QPointF &topLeft, QPointF &downRig
     this->scaleY = size.height() / diff.y();
 
     this->depthBuffer = QVector<double>(area, INFINITY);
+    this->lightBuffer = QVector<double>(area, 0);
     this->flagBuffer = QVector<int>(area, 0);
 }
 
-QPoint RDepthBuffer::convertViewToPixel(const QPointF &worldPoint) {
+QPoint RDepthBuffer::convertViewToPixel(const QPointF &worldPoint) const {
     QPointF shift = worldPoint - this->topLeft;
     double x = shift.x() * this->scaleX;
     double y = shift.y() * this->scaleY;
     return QPoint(std::round(x), std::round(y));
 }
 
-QPointF RDepthBuffer::convertPixelToView(const QPoint &pixelPosition) {
+QPointF RDepthBuffer::convertPixelToView(const QPoint &pixelPosition) const {
     double x = pixelPosition.x() / this->scaleX;
     double y = pixelPosition.y() / this->scaleY;
     return QPointF(x, y) + this->topLeft;
 }
 
-bool RDepthBuffer::update(const QPoint &pos, double depth, int flag) {
+bool RDepthBuffer::update(const QPoint &pos, int flag, double depth, double light) {
     int index = IDX(pos.y(), pos.x());
     double oldDepth = this->depthBuffer[index];
 
     if (depth < oldDepth && depth > 0) {
-        this->depthBuffer[index] = depth;
         this->flagBuffer[index] = flag;
+        this->depthBuffer[index] = depth;
+        this->lightBuffer[index] = light;
         return true;
     }
 
@@ -74,6 +76,32 @@ void RDepthBuffer::toDepthImage(QImage &im, const QSizeF &viewportSize)
             } else {
                 scanline[j] = 0;
             }
+        }
+    }
+}
+
+void RDepthBuffer::toImage(QImage &im, const QSizeF &viewportSize)
+{
+    double scaleH = viewportSize.height() / im.height();
+    double scaleW = viewportSize.width() / im.width();
+    double pixelOffsetX = im.width() / 2.0;
+    double pixelOffsetY = im.height() / 2.0;
+
+    double maxBright = 0.0;
+    for (int i=0; i<H(); i++)
+        for (int j=0; j<W(); j++) {
+            double b = getBrightness(QPoint(j, i));
+            if (std::isnormal(b) && b > maxBright)
+                maxBright = b;
+        }
+
+    for (int i=0; i<im.height(); i++) {
+        uchar *scanline = im.scanLine(i);
+        for (int j=0; j<im.width(); j++) {
+            QPointF worldPoint((j - pixelOffsetY) * scaleW, (i - pixelOffsetX) * scaleH);
+            QPoint pos = convertViewToPixel(worldPoint);
+            double bval = getBrightness(pos);
+            scanline[j] = 255 * bval / maxBright;
         }
     }
 }

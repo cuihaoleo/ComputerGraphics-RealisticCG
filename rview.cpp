@@ -9,6 +9,8 @@
 #include <QQuaternion>
 #include <QSize>
 
+#include <memory>
+
 #include <cmath>
 
 static QVector4D solvePlane(
@@ -80,7 +82,7 @@ RView::RView(const QVector3D &viewPoint, const QVector3D &viewUp)
     constructor(viewPoint, angle);
 }
 
-RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize)
+RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize, bool viewOnly)
 {
     QVector<QVector3D> viewPoints;
     double maxX, maxY;
@@ -100,6 +102,7 @@ RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize)
 
     QPointF topLeft(minX - 1, minY - 1);
     QPointF downRight(maxX + 1, maxY + 1);
+
     RDepthBuffer buffer(bufferSize, topLeft, downRight);
 
     QVector<QPoint> drawPoints;
@@ -116,7 +119,7 @@ RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize)
     };
     QVector<QVector<PTItem>> PT(bufferSize.height());
 
-    for (int i=0; i<drawPoints.size(); i++) {
+    for (int i=0; i<scene.mesh.size(); i++) {
         const QPoint &pa = drawPoints[scene.mesh[i][0]];
         const QPoint &pb = drawPoints[scene.mesh[i][1]];
         const QPoint &pc = drawPoints[scene.mesh[i][2]];
@@ -190,7 +193,19 @@ RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize)
             double z = (-A*xstart - B*y - D) / C; // z at (xstart, y)
             for (int x=xstart; x<=xend; x++) {
                 z -= A / C;
-                buffer.update(QPoint(x, y), z, iter->index);
+
+                if (z <= 0)
+                    continue;
+
+                if (viewOnly)
+                    buffer.update(QPoint(x, y), iter->index, z);
+                else {
+                    QPointF view = buffer.convertPixelToView(QPoint(x, y));
+                    QVector3D world = viewTransformR.map(QVector3D(view.x(), view.y(), z));
+                    double bright = scene.getBrightness(world, iter->index);
+                    double decayed = bright / (z * z);
+                    buffer.update(QPoint(x, y), iter->index, z, decayed);
+                }
             }
 
             iter->xstart += iter->kac;

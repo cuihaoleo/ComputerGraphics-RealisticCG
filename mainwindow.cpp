@@ -26,6 +26,16 @@ void MainWindow::showEvent(QShowEvent* event) {
     world.addTriangle(0, 1, 3);
     world.addTriangle(1, 2, 3);
 
+    world.addPoint(QVector3D(4, -1.2, 4));
+    world.addPoint(QVector3D(-4, -1.2, 4));
+    world.addPoint(QVector3D(-4, -1.2, -4));
+    world.addPoint(QVector3D(4, -1.2, -4));
+    world.addTriangle(4, 5, 6);
+    world.addTriangle(6, 7, 4);
+
+    world.setBaseBrightness(0.2);
+    world.addLight(QVector3D(0, 10, 10), 40);
+
     realisticScene = new RealisticScene(world, QSize(512, 512));
     ui->graphicsView->setScene(realisticScene);
     ui->graphicsView->fitInView(realisticScene->sceneRect(), Qt::KeepAspectRatio);

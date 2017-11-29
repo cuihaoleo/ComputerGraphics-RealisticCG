@@ -19,6 +19,8 @@ protected:
     QMatrix4x4 viewTransformR;
 
 public:
+    enum ViewType { LIGHT, VIEWONLY };
+
     RView() {}
 
     RView(const QVector3D &viewPoint, double angle) {
@@ -27,7 +29,9 @@ public:
 
     RView(const QVector3D &viewPoint, const QVector3D &viewUp);
 
-    RDepthBuffer lookAt(const RScene &scene, const QSize &bufferSize);
+    RDepthBuffer lookAt(const RScene &scene, const QSize &bufferSize, bool viewOnly=false);
+    QMatrix4x4 getTransform() { return viewTransform; }
+    QMatrix4x4 getTransformR() { return viewTransformR; }
 };
 
 
