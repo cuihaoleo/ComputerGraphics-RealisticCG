@@ -14,7 +14,6 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 void MainWindow::showEvent(QShowEvent* event) {
-    RScene world;
     int a, b, c, d, e, f, g, h;
 
     a = world.addPoint(QVector3D(0, 1, 0));
@@ -55,15 +54,28 @@ void MainWindow::showEvent(QShowEvent* event) {
     world.addPolygon({a, b, c, d}, 0.4);
 
     world.setBaseLight(0.2);
-    world.addLight(QVector3D(1, 4, 5), 5);
 
-    realisticScene = new RealisticScene(world, QSize(512, 512));
-    ui->graphicsView->setScene(realisticScene);
-    ui->graphicsView->fitInView(realisticScene->sceneRect(), Qt::KeepAspectRatio);
+    viewportSize = QSizeF(6, 4);
+    imageSize = QSize(600, 400);
+
+    canvas = new QGraphicsScene();
+    canvas->setBackgroundBrush(Qt::gray);
+    image = QImage(imageSize, QImage::Format_RGB32);
+    pixmapItem = canvas->addPixmap(QPixmap::fromImage(image));
+
+    ui->graphicsView->setScene(canvas);
+    ui->graphicsView->fitInView(canvas->sceneRect(), Qt::KeepAspectRatio);
     ui->graphicsView->show();
 
+    blockUpdate = true;
     ui->sliderAzimuth->setValue(58);
     ui->sliderY->setValue(26);
+    ui->sliderLightAzimuth->setValue(48);
+    ui->sliderLightB->setValue(50);
+    ui->sliderLightG->setValue(50);
+    ui->sliderLightR->setValue(50);
+    blockUpdate = false;
+    updateLight();
 
     QWidget::showEvent(event);
 }
@@ -76,22 +88,47 @@ MainWindow::~MainWindow()
 void MainWindow::on_sliderAzimuth_valueChanged(int value)
 {
     viewAzimuth = value / 100.0 * M_PI + M_PI_2;
-    updateScene();
+    updateView();
 }
 
 void MainWindow::on_sliderY_valueChanged(int value)
 {
     viewY = -0.5 + value / 20.0;
-    updateScene();
+    updateView();
 }
 
-void MainWindow::updateScene()
+void MainWindow::on_sliderLightAzimuth_valueChanged(int value)
+{
+    lightAzimuth = value / 100.0 * M_PI * 2;
+    updateLight();
+}
+
+void MainWindow::on_sliderLightB_valueChanged(int value)
+{
+    lightColor[0] = value / 10.0;
+    updateLight();
+}
+
+void MainWindow::on_sliderLightG_valueChanged(int value)
+{
+    lightColor[1] = value / 10.0;
+    updateLight();
+}
+
+void MainWindow::on_sliderLightR_valueChanged(int value)
+{
+    lightColor[2] = value / 10.0;
+    updateLight();
+}
+
+void MainWindow::updateView()
 {
     using namespace std;
 
+    if (blockUpdate) return;
+
     static const QVector3D axisY(0, 1, 0);
-    double rxz = std::sqrt(viewRadius * viewRadius - viewY * viewY);
-    assert(rxz > 0);
+    double rxz = sqrt(viewRadius * viewRadius - viewY * viewY);
     double viewZ = -rxz * cos(viewAzimuth);
     double viewX = rxz * sin(viewAzimuth);
     QVector3D viewPoint = QVector3D(viewX, viewY, viewZ);
@@ -100,5 +137,24 @@ void MainWindow::updateScene()
     viewUp = QVector3D::crossProduct(viewPoint, axisY);
     viewUp = QVector3D::crossProduct(viewPoint, viewUp);
 
-    realisticScene->setView(QVector3D(viewX, viewY, viewZ), viewUp);
+    view = RView(QVector3D(viewX, viewY, viewZ), viewUp);
+    RDepthBuffer buffer = view.lookAt(world, imageSize);
+    buffer.toImage(image, viewportSize);
+    pixmapItem->setPixmap(QPixmap::fromImage(image));
+}
+
+void MainWindow::updateLight()
+{
+    using namespace std;
+
+    if (blockUpdate) return;
+
+    double rxz = sqrt(lightRadius * lightRadius - lightY * lightY);
+    double lightZ = -rxz * cos(lightAzimuth);
+    double lightX = rxz * sin(lightAzimuth);
+
+    world.clearLights();
+    world.addLight(QVector3D(lightX, lightY, lightZ), lightColor);
+
+    updateView();
 }

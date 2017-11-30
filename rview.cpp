@@ -24,18 +24,6 @@ static QVector4D solvePlane(
     return QVector4D(n, d);
 }
 
-static double angleBetween(const QVector3D &a, const QVector3D &b, QVector3D *axis = nullptr) {
-    QVector3D na = a.normalized();
-    QVector3D nb = b.normalized();
-    QVector3D normal = QVector3D::crossProduct(na, nb);
-    double angle = std::atan2(normal.length(), QVector3D::dotProduct(na, nb));
-
-    if (axis != nullptr)
-        *axis = normal.normalized();
-
-    return angle;
-}
-
 static QMatrix4x4 rotateMatrixBetween(const QVector3D &a, const QVector3D &b) {
     QVector3D cross = QVector3D::crossProduct(a, b);
     double dot = QVector3D::dotProduct(a, b);
@@ -137,7 +125,7 @@ RDepthBuffer RView::lookAt(const RScene &scene, const QSize &bufferSize, bool vi
     };
     std::vector<std::list<PTItem>> PT(bufferSize.height());
 
-    for (int i=0; i<scene.mesh.size(); i++) {
+    for (int i=0; i<int(scene.mesh.size()); i++) {
         const QPoint &pa = drawPoints[scene.mesh[i][0]];
         const QPoint &pb = drawPoints[scene.mesh[i][1]];
         const QPoint &pc = drawPoints[scene.mesh[i][2]];

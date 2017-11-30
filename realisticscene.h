@@ -16,7 +16,7 @@ class RealisticScene : public QGraphicsScene
     Q_OBJECT
 
 private:
-    RScene world;
+    const RScene *world;
     RView view;
 
     QPointF startPosition;
@@ -28,7 +28,7 @@ private:
     QSizeF viewportSize;
 
 public:
-    explicit RealisticScene(const RScene &sence, const QSize &imageSize, QObject *parent = 0);
+    explicit RealisticScene(const RScene *sence, const QSize &imageSize, QObject *parent = 0);
     void setView(QVector3D viewPoint, QVector3D viewUp);
 };
 

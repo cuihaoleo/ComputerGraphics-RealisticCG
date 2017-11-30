@@ -1,6 +1,8 @@
 #include "rview.h"
 #include "rscene.h"
 
+#include <cassert>
+
 #include <QPolygon>
 
 int RScene::addPoint(const QVector3D &point) {
@@ -35,12 +37,12 @@ void RScene::addPolygon(std::initializer_list<int> args, const QVector3D &reflec
     }
 }
 
-void RScene::addLight(const QVector3D &origin, const QVector3D &light, QSize bsize)
+void RScene::addLight(const QVector3D &origin, const QVector3D &lightBGR, QSize bsize)
 {
     RView view(origin, 0);
     QMatrix4x4 transform = view.getTransform();
     RDepthBuffer buffer = view.lookAt(*this, bsize, true);
-    LightDescribe store = { buffer, transform, light };
+    LightDescribe store = { buffer, transform, lightBGR };
     lights.push_back(store);
 }
 

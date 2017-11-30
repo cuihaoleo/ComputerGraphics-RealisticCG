@@ -50,9 +50,13 @@ public:
         addPolygon(args, QVector3D(r, r, r));
     }
 
-    void addLight(const QVector3D &origin, const QVector3D &light, QSize bsize = QSize(1024, 1024));
+    void addLight(const QVector3D &origin, const QVector3D &lightBGR, QSize bsize = QSize(1024, 1024));
     void addLight(const QVector3D &origin, double light, QSize bsize = QSize(1024, 1024)) {
         addLight(origin, QVector3D(light, light, light), bsize);
+    }
+
+    void clearLights() {
+        lights.clear();
     }
 
     QVector3D getLight(const QVector3D &position, int meshIndex) const;

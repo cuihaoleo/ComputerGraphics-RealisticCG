@@ -4,7 +4,6 @@
 #include "rscene.h"
 #include "rdepthbuffer.h"
 
-#include <QImage>
 #include <QVector3D>
 #include <QMatrix4x4>
 
@@ -19,8 +18,6 @@ protected:
     QMatrix4x4 viewTransformR;
 
 public:
-    enum ViewType { LIGHT, VIEWONLY };
-
     RView() {}
 
     RView(const QVector3D &viewPoint, double angle) {

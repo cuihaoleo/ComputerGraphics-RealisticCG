@@ -5,7 +5,7 @@
 
 #include <QMatrix4x4>
 
-RealisticScene::RealisticScene(const RScene &sence, const QSize &imageSize, QObject *parent):
+RealisticScene::RealisticScene(const RScene *sence, const QSize &imageSize, QObject *parent):
     QGraphicsScene(parent)
 {
     this->setBackgroundBrush(Qt::gray);
@@ -21,7 +21,7 @@ RealisticScene::RealisticScene(const RScene &sence, const QSize &imageSize, QObj
 void RealisticScene::setView(QVector3D viewPoint, QVector3D viewUp)
 {
     view = RView(viewPoint, viewUp);
-    RDepthBuffer buffer = view.lookAt(world, imageSize);
+    RDepthBuffer buffer = view.lookAt(*world, imageSize);
     buffer.toImage(image, viewportSize);
     pixmapItem->setPixmap(QPixmap::fromImage(image));
 }

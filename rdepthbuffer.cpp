@@ -48,43 +48,7 @@ bool RDepthBuffer::update(const QPoint &pos, int flag, double depth, const QVect
     return false;
 }
 
-void RDepthBuffer::toDepthImage(QImage &im, const QSizeF &viewportSize)
-{
-    double scaleH = viewportSize.height() / im.height();
-    double scaleW = viewportSize.width() / im.width();
-    double pixelOffsetX = im.width() / 2.0;
-    double pixelOffsetY = im.height() / 2.0;
-
-    double maxZ = 1.0;
-    for (int i=0; i<H(); i++)
-        for (int j=0; j<W(); j++) {
-            double z = getDepth(QPoint(j, i));
-            if (std::isnormal(z) && z > maxZ)
-                maxZ = z;
-        }
-
-    maxZ *= 1.1;
-    for (int i=0; i<im.height(); i++) {
-        uchar *scanline = im.scanLine(i);
-        for (int j=0; j<im.width(); j++) {
-            QPointF worldPoint((j - pixelOffsetY) * scaleW, (i - pixelOffsetX) * scaleH);
-            QPoint pos = convertViewToPixel(worldPoint);
-
-            double zval = INFINITY;
-
-            if (VALID_IDX(pos.y(), pos.x()))
-                zval = depthBuffer[IDX(pos.y(), pos.x())];
-
-            if (std::isnormal(zval)) {
-                scanline[j] = 255 * (1 - zval / maxZ);
-            } else {
-                scanline[j] = 0;
-            }
-        }
-    }
-}
-
-void RDepthBuffer::toImage(QImage &im, const QSizeF &viewportSize)
+void RDepthBuffer::toImage(QImage &im, const QSizeF &viewportSize) const
 {
     double scaleH = viewportSize.height() / im.height();
     double scaleW = viewportSize.width() / im.width();
@@ -103,7 +67,7 @@ void RDepthBuffer::toImage(QImage &im, const QSizeF &viewportSize)
     for (int i=0; i<im.height(); i++) {
         QRgb *scanline = (QRgb*)im.scanLine(i);
         for (int j=0; j<im.width(); j++) {
-            QPointF worldPoint((j - pixelOffsetY) * scaleW, (i - pixelOffsetX) * scaleH);
+            QPointF worldPoint((j - pixelOffsetX) * scaleH, (i - pixelOffsetY) * scaleW);
             QPoint pos = convertViewToPixel(worldPoint);
 
             QVector3D light = getLight(pos);

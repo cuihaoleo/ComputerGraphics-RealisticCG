@@ -5,7 +5,6 @@
 #include <cmath>
 
 #include <vector>
-#include <cassert>
 
 #include <QVector3D>
 #include <QPoint>
@@ -31,7 +30,7 @@ private:
     }
 
     int IDX(int i, int j) const {
-        return i * bufferSize.height() + j;
+        return i * bufferSize.width() + j;
     }
 
 public:
@@ -44,8 +43,7 @@ public:
         return update(pos, flag, depth, QVector3D(light, light, light));
     }
 
-    void toDepthImage(QImage &im, const QSizeF &viewportSize);
-    void toImage(QImage &im, const QSizeF &viewportSize);
+    void toImage(QImage &im, const QSizeF &viewportSize) const;
 
     int W() const { return bufferSize.width(); }
     int H() const { return bufferSize.height(); }
