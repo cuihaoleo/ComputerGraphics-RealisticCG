@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 
 #include "rscene.h"
-#include "realisticscene.h"
 
 #include <QDebug>
 

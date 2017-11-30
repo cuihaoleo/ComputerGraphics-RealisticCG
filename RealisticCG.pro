@@ -29,15 +29,13 @@ SOURCES += \
         mainwindow.cpp \
     rview.cpp \
     rscene.cpp \
-    rdepthbuffer.cpp \
-    realisticscene.cpp
+    rdepthbuffer.cpp
 
 HEADERS += \
         mainwindow.h \
     rview.h \
     rscene.h \
-    rdepthbuffer.h \
-    realisticscene.h
+    rdepthbuffer.h
 
 FORMS += \
         mainwindow.ui
